@@ -1,5 +1,6 @@
 from qdrant_client import QdrantClient
 from embed import embed_text
+from reranker import rerank
 
 def search_DB(client, text):
     query_list = embed_text(text).tolist()
@@ -7,7 +8,7 @@ def search_DB(client, text):
     res = client.query_points(
         collection_name = "HR",
         query = query_list,
-        limit = 3
+        limit = 10
     )
 
-    return "\n\n".join(r.payload["text"] for r in res.points)
+    return rerank(text, res.points)
